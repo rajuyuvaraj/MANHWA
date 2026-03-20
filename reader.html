@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reading Manhwa - INKVERSE</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Serif+KR:wght@300;400;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0a0608;
+    --paper: #f5ede0;
+    --crimson: #c0183a;
+    --gold: #e8a827;
+    --mist: #8b7d8f;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--ink); color: var(--paper); font-family: 'Noto Serif KR', serif; }
+
+  /* NAV */
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 15px 48px; background: rgba(10,6,8,0.95); border-bottom: 1px solid rgba(139,125,143,0.15); transition: transform 0.3s; }
+  .nav-hidden { transform: translateY(-100%); }
+  .logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; letter-spacing: 0.12em; color: var(--paper); text-decoration: none; }
+  .logo span { color: var(--crimson); }
+  .nav-center { font-family: 'Space Mono', monospace; font-size: 0.9rem; color: var(--gold); letter-spacing: 0.1em; }
+  .nav-btn { font-family: 'Space Mono', monospace; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; padding: 8px 20px; background: transparent; color: var(--mist); border: 1px solid var(--mist); cursor: pointer; text-decoration: none; transition: 0.3s; }
+  .nav-btn:hover { color: var(--gold); border-color: var(--gold); }
+
+  /* READER CONTAINER - Webtoon style (no gaps) */
+  .reader-container { max-width: 800px; margin: 80px auto 0; display: flex; flex-direction: column; align-items: center; }
+  .reader-container img { width: 100%; height: auto; display: block; margin: 0; padding: 0; border: none; outline: none; }
+  
+  .error-msg { text-align: center; padding: 100px 20px; color: var(--mist); font-family: 'Space Mono', monospace; }
+
+  /* BOTTOM NAVIGATION */
+  .bottom-nav { max-width: 800px; margin: 0 auto; padding: 40px 20px 80px; display: flex; justify-content: space-between; align-items: center; }
+  .ch-btn { font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; letter-spacing: 0.1em; padding: 12px 30px; background: var(--crimson); color: var(--paper); border: none; cursor: pointer; text-decoration: none; transition: background 0.3s; }
+  .ch-btn:hover { background: var(--gold); }
+  .ch-btn.disabled { opacity: 0.3; pointer-events: none; }
+</style>
+</head>
+<body>
+
+<nav id="navbar">
+  <button class="nav-btn" onclick="window.location.href='manhwa-details.html'">← Chapter List</button>
+  <div class="nav-center" id="chapterTitle">Loading...</div>
+  <a href="manhwa-site.html" class="logo">INK<span>VERSE</span></a>
+</nav>
+
+<div class="reader-container" id="readerContainer">
+  <!-- Images injected by JS -->
+</div>
+
+<div class="bottom-nav">
+  <a href="#" id="prevBtn" class="ch-btn">Prev Chapter</a>
+  <a href="#" id="nextBtn" class="ch-btn">Next Chapter</a>
+</div>
+
+<!-- Auto-generated data script -->
+<script src="chapters-data.js"></script>
+<script>
+  // Get chapter from URL (e.g., reader.html?ch=1)
+  const urlParams = new URLSearchParams(window.location.search);
+  const currentCh = parseInt(urlParams.get('ch')) || 1;
+
+  const container = document.getElementById('readerContainer');
+  const titleEl = document.getElementById('chapterTitle');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+
+  // MANHWA_DATA is loaded from chapters-data.js created by update.js
+  const chapterData = MANHWA_DATA[currentCh];
+
+  if (!chapterData) {
+    container.innerHTML = `<div class="error-msg">Chapter ${currentCh} is not uploaded yet.<br><br>Waiting for Ammu's creator to draw more! 💖</div>`;
+    titleEl.textContent = "Not Found";
+  } else {
+    titleEl.textContent = chapterData.title;
+    
+    // Auto-generate image tags
+    for (let i = 1; i <= chapterData.pages; i++) {
+      const img = document.createElement('img');
+      const extension = chapterData.ext || ".jpg"; // Defaults to jpg if not specified
+      
+      img.src = `chapters/ch${currentCh}/${i}${extension}`;
+      img.alt = `Page ${i}`;
+      img.loading = "lazy"; // Important for fast loading
+      container.appendChild(img);
+    }
+  }
+
+  // Setup Next/Prev Buttons
+  if (MANHWA_DATA[currentCh - 1]) {
+    prevBtn.href = `reader.html?ch=${currentCh - 1}`;
+  } else {
+    prevBtn.classList.add('disabled');
+  }
+
+  if (MANHWA_DATA[currentCh + 1]) {
+    nextBtn.href = `reader.html?ch=${currentCh + 1}`;
+  } else {
+    nextBtn.classList.add('disabled');
+  }
+
+  // Hide Nav on Scroll Down, Show on Scroll Up (Webtoon style)
+  let lastScrollY = window.scrollY;
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > lastScrollY && window.scrollY > 100) {
+      navbar.classList.add('nav-hidden');
+    } else {
+      navbar.classList.remove('nav-hidden');
+    }
+    lastScrollY = window.scrollY;
+  });
+</script>
+</body>
+</html>

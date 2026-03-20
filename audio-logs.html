@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audio Logs - INKVERSE</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Serif+KR:wght@300;400;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0a0608;
+    --paper: #f5ede0;
+    --crimson: #c0183a;
+    --gold: #e8a827;
+    --ash: #1e1520;
+    --mist: #8b7d8f;
+    --panel: #13101a;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--ink); color: var(--paper); font-family: 'Noto Serif KR', serif; cursor: none; padding-bottom: 150px; } /* padding for fixed player */
+
+  /* CUSTOM CURSOR */
+  .cursor { position: fixed; width: 16px; height: 16px; background: var(--crimson); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: transform 0.1s, width 0.3s, height 0.3s; mix-blend-mode: difference; }
+  .cursor-ring { position: fixed; width: 44px; height: 44px; border: 1.5px solid var(--gold); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); transition: transform 0.18s ease, width 0.3s, height 0.3s; }
+
+  /* NAV */
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 20px 48px; background: rgba(10,6,8,0.95); border-bottom: 1px solid rgba(139,125,143,0.15); }
+  .logo { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 0.12em; color: var(--paper); text-decoration: none; }
+  .logo span { color: var(--crimson); }
+  .nav-btn { font-family: 'Space Mono', monospace; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; padding: 10px 24px; background: transparent; color: var(--mist); border: 1px solid var(--mist); cursor: none; transition: 0.3s; }
+  .nav-btn:hover { color: var(--gold); border-color: var(--gold); }
+
+  /* HEADER */
+  .header-section { text-align: center; padding: 120px 48px 40px; }
+  .header-tag { font-family: 'Space Mono', monospace; font-size: 0.8rem; color: var(--gold); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 10px; }
+  .header-title { font-family: 'Bebas Neue', sans-serif; font-size: 4rem; line-height: 0.95; color: var(--paper); }
+  
+  /* AUDIO LIST */
+  .audio-list-container { max-width: 800px; margin: 0 auto 100px; padding: 0 20px; }
+  .audio-item { background: var(--panel); border: 1px solid rgba(139,125,143,0.12); padding: 24px; margin-bottom: 12px; display: flex; align-items: center; gap: 24px; cursor: none; transition: transform 0.2s, border-color 0.3s; }
+  .audio-item:hover { transform: translateX(10px); border-color: var(--gold); background: rgba(232,168,39,0.05); }
+  .audio-item.active { border-color: var(--crimson); background: rgba(192,24,58,0.05); }
+
+  .play-icon { width: 50px; height: 50px; background: rgba(245,237,224,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--gold); font-size: 1.2rem; transition: background 0.3s; }
+  .audio-item:hover .play-icon { background: var(--crimson); color: var(--paper); }
+  .audio-item.active .play-icon { background: var(--crimson); color: var(--paper); }
+  
+  .audio-info { flex-grow: 1; }
+  .audio-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; color: var(--paper); letter-spacing: 0.05em; margin-bottom: 4px; }
+  .audio-date { font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--mist); letter-spacing: 0.1em; }
+  .audio-duration { font-family: 'Space Mono', monospace; font-size: 0.8rem; color: var(--gold); }
+
+  /* PERSISTENT PLAYER */
+  .player-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--panel); border-top: 1px solid rgba(232,168,39,0.3); padding: 20px 48px; display: flex; align-items: center; gap: 30px; z-index: 100; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 -10px 40px rgba(0,0,0,0.5); }
+  .player-bar.visible { transform: translateY(0); }
+
+  .player-btn { width: 60px; height: 60px; border-radius: 50%; background: var(--crimson); border: none; color: var(--paper); font-size: 1.5rem; display: flex; align-items: center; justify-content: center; cursor: none; transition: transform 0.2s, background 0.3s; }
+  .player-btn:hover { background: var(--gold); transform: scale(1.05); }
+
+  .player-details { flex-grow: 1; display: flex; flex-direction: column; gap: 8px; }
+  .player-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; color: var(--paper); letter-spacing: 0.05em; }
+  
+  .progress-container { width: 100%; height: 6px; background: rgba(139,125,143,0.15); border-radius: 3px; position: relative; cursor: none; }
+  .progress-filled { width: 0%; height: 100%; background: var(--gold); border-radius: 3px; position: absolute; top: 0; left: 0; pointer-events: none; }
+  .progress-head { width: 12px; height: 12px; background: var(--paper); border-radius: 50%; position: absolute; top: -3px; left: 0%; transform: translateX(-50%); box-shadow: 0 0 10px rgba(232,168,39,0.8); pointer-events: none; }
+
+  .time-info { display: flex; justify-content: space-between; font-family: 'Space Mono', monospace; font-size: 0.65rem; color: var(--mist); letter-spacing: 0.1em; }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<nav>
+  <a href="manhwa-site.html" class="logo">INK<span>VERSE</span></a>
+  <button class="nav-btn" onclick="window.location.href='manhwa-site.html'">← Back Home</button>
+</nav>
+
+<div class="header-section">
+  <div class="header-tag">Creator's Diary</div>
+  <h1 class="header-title">HOW WAS MY DAY</h1>
+</div>
+
+<div class="audio-list-container" id="audioList">
+  <!-- Audio items generated by JS -->
+</div>
+
+<!-- PERSISTENT PLAYER -->
+<div class="player-bar" id="playerBar">
+  <button class="player-btn" id="playPauseBtn">▶</button>
+  <div class="player-details">
+    <div class="player-title" id="playerTitle">Select a track</div>
+    <div class="progress-container" id="progressContainer">
+      <div class="progress-filled" id="progressFilled"></div>
+      <div class="progress-head" id="progressHead"></div>
+    </div>
+    <div class="time-info">
+      <span id="currentTime">00:00</span>
+      <span id="totalTime">00:00</span>
+    </div>
+  </div>
+  <audio id="audioElement"></audio>
+</div>
+
+<script>
+  // CURSOR
+  const cursor = document.getElementById('cursor'); const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+  function animCursor() { cursor.style.left = mx+'px'; cursor.style.top = my+'px'; rx += (mx-rx)*0.12; ry += (my-ry)*0.12; ring.style.left = rx+'px'; ring.style.top = ry+'px'; requestAnimationFrame(animCursor); }
+  animCursor();
+
+  // AUDIO DATA
+  const audioData = [
+    { id: 1, title: "March 20th Update: Thinking of you", date: "MAR 20, 2026", duration: "03:15", src: "audio/track-1.mp3" },
+    { id: 2, title: "March 19th Update: Missing you", date: "MAR 19, 2026", duration: "04:20", src: "audio/track-2.mp3" },
+    { id: 3, title: "March 18th Update: How my day went", date: "MAR 18, 2026", duration: "02:45", src: "audio/track-3.mp3" }
+  ];
+
+  const audioListEl = document.getElementById('audioList');
+  const playerBar = document.getElementById('playerBar');
+  const audioElement = document.getElementById('audioElement');
+  const playPauseBtn = document.getElementById('playPauseBtn');
+  const playerTitle = document.getElementById('playerTitle');
+  const progressFilled = document.getElementById('progressFilled');
+  const progressHead = document.getElementById('progressHead');
+  const progressContainer = document.getElementById('progressContainer');
+  const currentTimeEl = document.getElementById('currentTime');
+  const totalTimeEl = document.getElementById('totalTime');
+
+  let currentTrackId = null;
+
+  // Render List
+  function renderList() {
+    audioListEl.innerHTML = '';
+    audioData.forEach(track => {
+      const item = document.createElement('div');
+      item.className = 'audio-item ' + (currentTrackId === track.id ? 'active' : '');
+      item.innerHTML = `
+        <div class="play-icon">${currentTrackId === track.id && !audioElement.paused ? '⏸' : '▶'}</div>
+        <div class="audio-info">
+          <div class="audio-title">${track.title}</div>
+          <div class="audio-date">${track.date}</div>
+        </div>
+        <div class="audio-duration">${track.duration}</div>
+      `;
+      item.onclick = () => playTrack(track);
+      
+      // Cursor effects
+      item.addEventListener('mouseenter', () => { cursor.style.width='28px'; cursor.style.height='28px'; ring.style.width='64px'; ring.style.height='64px'; });
+      item.addEventListener('mouseleave', () => { cursor.style.width='16px'; cursor.style.height='16px'; ring.style.width='44px'; ring.style.height='44px'; });
+      
+      audioListEl.appendChild(item);
+    });
+  }
+
+  function playTrack(track) {
+    if (currentTrackId === track.id) {
+      togglePlay();
+      return;
+    }
+    currentTrackId = track.id;
+    audioElement.src = track.src;
+    playerTitle.textContent = track.title;
+    audioElement.play();
+    playerBar.classList.add('visible');
+    playPauseBtn.textContent = '⏸';
+    renderList(); // Refresh active states
+  }
+
+  function togglePlay() {
+    if (audioElement.paused) { audioElement.play(); playPauseBtn.textContent = '⏸'; } 
+    else { audioElement.pause(); playPauseBtn.textContent = '▶'; }
+    renderList();
+  }
+
+  playPauseBtn.onclick = togglePlay;
+
+  // Format time (seconds to MM:SS)
+  function formatTime(sec) {
+    const m = Math.floor(sec / 60) || 0;
+    const s = Math.floor(sec % 60) || 0;
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  }
+
+  // Update Progress
+  audioElement.addEventListener('timeupdate', () => {
+    const current = audioElement.currentTime;
+    const duration = audioElement.duration;
+    if (duration) {
+      const percent = (current / duration) * 100;
+      progressFilled.style.width = percent + '%';
+      progressHead.style.left = percent + '%';
+      currentTimeEl.textContent = formatTime(current);
+      totalTimeEl.textContent = formatTime(duration);
+    }
+  });
+
+  // Click to seek
+  progressContainer.addEventListener('click', (e) => {
+    const rect = progressContainer.getBoundingClientRect();
+    const pos = (e.clientX - rect.left) / rect.width;
+    audioElement.currentTime = pos * audioElement.duration;
+  });
+
+  // End of track handling
+  audioElement.addEventListener('ended', () => {
+    playPauseBtn.textContent = '▶';
+    renderList();
+  });
+
+  // Initial render
+  renderList();
+
+  // Add nav/button cursor logic
+  document.querySelectorAll('a, button, .progress-container').forEach(el => {
+    el.addEventListener('mouseenter', () => { cursor.style.width='28px'; cursor.style.height='28px'; ring.style.width='64px'; ring.style.height='64px'; });
+    el.addEventListener('mouseleave', () => { cursor.style.width='16px'; cursor.style.height='16px'; ring.style.width='44px'; ring.style.height='44px'; });
+  });
+</script>
+</body>
+</html>

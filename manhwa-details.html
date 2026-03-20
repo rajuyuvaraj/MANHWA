@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Demon Lord - INKVERSE</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Serif+KR:wght@300;400;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0a0608;
+    --paper: #f5ede0;
+    --crimson: #c0183a;
+    --gold: #e8a827;
+    --ash: #1e1520;
+    --mist: #8b7d8f;
+    --panel: #13101a;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--ink); color: var(--paper); font-family: 'Noto Serif KR', serif; cursor: none; }
+
+  /* CUSTOM CURSOR */
+  .cursor { position: fixed; width: 16px; height: 16px; background: var(--crimson); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: transform 0.1s, width 0.3s, height 0.3s; mix-blend-mode: difference; }
+  .cursor-ring { position: fixed; width: 44px; height: 44px; border: 1.5px solid var(--gold); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); transition: transform 0.18s ease, width 0.3s, height 0.3s; }
+
+  /* NAV */
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 20px 48px; background: rgba(10,6,8,0.95); border-bottom: 1px solid rgba(139,125,143,0.15); }
+  .logo { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 0.12em; color: var(--paper); text-decoration: none; }
+  .logo span { color: var(--crimson); }
+  .nav-btn { font-family: 'Space Mono', monospace; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; padding: 10px 24px; background: transparent; color: var(--mist); border: 1px solid var(--mist); cursor: none; transition: 0.3s; }
+  .nav-btn:hover { color: var(--gold); border-color: var(--gold); }
+
+  /* MANHWA HEADER */
+  .details-header { display: flex; gap: 40px; padding: 120px 48px 60px; max-width: 1000px; margin: 0 auto; }
+  .cover-img { width: 300px; border-radius: 4px; border: 2px solid rgba(232,168,39,0.3); box-shadow: 0 0 40px rgba(192,24,58,0.2); }
+  .details-info { display: flex; flex-direction: column; justify-content: center; }
+  .details-tag { font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--gold); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 10px; }
+  .details-title { font-family: 'Bebas Neue', sans-serif; font-size: 4rem; line-height: 0.95; color: var(--paper); margin-bottom: 20px; }
+  .details-desc { font-size: 1rem; line-height: 1.8; color: var(--mist); margin-bottom: 30px; font-weight: 300; }
+  .details-meta { font-family: 'Space Mono', monospace; font-size: 0.75rem; display: flex; gap: 20px; color: var(--mist); }
+
+  /* CHAPTER LIST */
+  .chapter-section { padding: 40px 48px 100px; max-width: 1000px; margin: 0 auto; }
+  .section-title { font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; letter-spacing: 0.05em; margin-bottom: 30px; color: var(--crimson); border-bottom: 1px solid rgba(139,125,143,0.15); padding-bottom: 10px; }
+  
+  .chapter-list { display: grid; gap: 10px; }
+  .chapter-item { background: var(--panel); border: 1px solid rgba(139,125,143,0.12); padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; text-decoration: none; color: inherit; transition: block 0.3s, transform 0.2s, border-color 0.3s; cursor: none; }
+  .chapter-item:hover { transform: translateX(10px); border-color: var(--gold); background: rgba(232,168,39,0.05); }
+  
+  .ch-info { display: flex; flex-direction: column; gap: 6px; }
+  .ch-num { font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; color: var(--paper); letter-spacing: 0.05em; }
+  .ch-date { font-family: 'Space Mono', monospace; font-size: 0.65rem; color: var(--mist); letter-spacing: 0.1em; }
+  
+  .ch-btn { font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--paper); background: var(--crimson); padding: 8px 24px; text-transform: uppercase; letter-spacing: 0.1em; clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%); }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<nav>
+  <a href="manhwa-site.html" class="logo">INK<span>VERSE</span></a>
+  <button class="nav-btn" onclick="window.location.href='manhwa-site.html'">← Back Home</button>
+</nav>
+
+<div class="details-header">
+  <img src="images/hero-image.jpg" class="cover-img" alt="Cover">
+  <div class="details-info">
+    <div class="details-tag">Romance / Fantasy</div>
+    <h1 class="details-title">The Demon Lord Fall in love with Heavenly beauty</h1>
+    <p class="details-desc">An epic tale of forbidden love that transcends the boundaries of the demonic realm and the heavenly skies. When the worlds collide, will love be enough to stop the impending war?</p>
+    <div class="details-meta">
+      <span>★ 10/10 RATING</span>
+      <span>STATUS: ONGOING</span>
+      <span>AUTHOR: AMMU</span>
+    </div>
+  </div>
+</div>
+
+<div class="chapter-section">
+  <h2 class="section-title">CHAPTERS</h2>
+
+  <div class="chapter-list" id="dynamicChapterList">
+    <!-- Chapter items generated automatically via JS -->
+  </div>
+</div>
+
+<script src="chapters-data.js"></script>
+<script>
+  // AUTO-GENERATE CHAPTER CARDS
+  const chapterListEl = document.getElementById('dynamicChapterList');
+  
+  // Sort chapters from highest to lowest
+  const chapterKeys = Object.keys(MANHWA_DATA).map(Number).sort((a, b) => b - a);
+
+  chapterKeys.forEach(ch => {
+    const data = MANHWA_DATA[ch];
+    
+    // Create link tag
+    const a = document.createElement('a');
+    a.href = `reader.html?ch=${ch}`;
+    a.className = 'chapter-item';
+    
+    a.innerHTML = `
+      <div class="ch-info">
+        <span class="ch-num">${data.title}</span>
+        <span class="ch-date">${data.date}</span>
+      </div>
+      <div class="ch-btn">Read</div>
+    `;
+    
+    chapterListEl.appendChild(a);
+  });
+
+  // CURSOR
+  const cursor = document.getElementById('cursor'); const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+  function animCursor() {
+    cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+    rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+    requestAnimationFrame(animCursor);
+  }
+  animCursor();
+  document.querySelectorAll('a, button, .chapter-item').forEach(el => {
+    el.addEventListener('mouseenter', () => { cursor.style.width='28px'; cursor.style.height='28px'; ring.style.width='64px'; ring.style.height='64px'; });
+    el.addEventListener('mouseleave', () => { cursor.style.width='16px'; cursor.style.height='16px'; ring.style.width='44px'; ring.style.height='44px'; });
+  });
+</script>
+</body>
+</html>
