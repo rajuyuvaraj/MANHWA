@@ -10,44 +10,56 @@ if (!fs.existsSync(chaptersDir)) {
   process.exit();
 }
 
+// ---------------------------------------------------------
+// DAILY SCHEDULE LOGIC
+// Chapter 3 is scheduled for March 20, 2026 at 18:00 (6:00 PM)
+// We calculate backwards/forwards so each chapter drops exactly 1 day apart.
+// ---------------------------------------------------------
+// Set the base drop time for Chapter 1: (March 18, 2026 at 18:00:00)
+const BASE_DATE = new Date("2026-03-18T18:00:00").getTime();
+const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+
 const folders = fs.readdirSync(chaptersDir);
 let manhwaData = {};
 
 folders.forEach(folder => {
-  // Check if it's a chapter folder like "ch1", "ch2"
   const match = folder.match(/^ch(\d+)$/i);
   if (match) {
     const chNum = parseInt(match[1]);
     const folderPath = path.join(chaptersDir, folder);
     
-    // Get stats to strictly check for directory
     if (fs.statSync(folderPath).isDirectory()) {
       const files = fs.readdirSync(folderPath);
-      
-      // Filter out non-image files
       const imageFiles = files.filter(f => /\.(png|jpg|jpeg|webp)$/i.test(f));
       
       if (imageFiles.length > 0) {
-        // Get the extension of the first image (assumes all inside use the same)
         const ext = path.extname(imageFiles[0]);
         
-        // Get folder creation time for the date!
-        const stat = fs.statSync(folderPath);
-        const uploadDate = stat.mtime.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }).toUpperCase();
+        // Calculate the exact unlock time for THIS chapter N:
+        // Chapter 1 = Base
+        // Chapter 2 = Base + 1 Day
+        // Chapter 3 = Base + 2 Days, etc.
+        const releaseTime = BASE_DATE + ((chNum - 1) * ONE_DAY_MS);
+        
+        // Format a nice date for display
+        const releaseDateObj = new Date(releaseTime);
+        const displayDate = releaseDateObj.toLocaleDateString('en-US', { 
+          month: 'short', day: '2-digit', year: 'numeric' 
+        }).toUpperCase();
         
         manhwaData[chNum] = {
           title: `Chapter ${chNum}`,
           pages: imageFiles.length,
           ext: ext,
-          date: uploadDate
+          releaseTime: releaseTime,
+          date: displayDate
         };
-        console.log(`Found Chapter ${chNum}: ${imageFiles.length} pages (${ext})`);
+        console.log(`Found Chapter ${chNum}: Scheduled for ${displayDate} 18:00`);
       }
     }
   }
 });
 
-// Create the JS code
 const jsContent = `/* 
   ======================================================
   THIS FILE IS AUTO-GENERATED. DO NOT EDIT THIS MANUALLY!
@@ -58,6 +70,5 @@ const jsContent = `/*
 const MANHWA_DATA = ${JSON.stringify(manhwaData, null, 2)};
 `;
 
-// Save it to chapters-data.js
 fs.writeFileSync(path.join(__dirname, 'chapters-data.js'), jsContent);
-console.log(`✅ Success! Updated website with ${Object.keys(manhwaData).length} chapters.`);
+console.log(`✅ Success! Updated website schedule with ${Object.keys(manhwaData).length} chapters.`);

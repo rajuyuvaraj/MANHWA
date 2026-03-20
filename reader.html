@@ -70,11 +70,15 @@
 
   // MANHWA_DATA is loaded from chapters-data.js created by update.js
   const chapterData = MANHWA_DATA[currentCh];
+  const now = Date.now();
 
   if (!chapterData) {
     container.innerHTML = `<div class="error-msg">Chapter ${currentCh} is not uploaded yet.<br><br>Waiting for Ammu's creator to draw more! 💖</div>`;
     titleEl.textContent = "Not Found";
-  } else {
+  } else if (now < chapterData.releaseTime) {
+    // SECURITY: Block user if they try to change the URL to read early
+    container.innerHTML = `<div class="error-msg">Chapter ${currentCh} is locked.<br><br>This chapter drops on ${chapterData.date} at 18:00 (6:00 PM)! ⏳</div>`;
+    titleEl.textContent = "Locked Content";
     titleEl.textContent = chapterData.title;
     
     // Auto-generate image tags
