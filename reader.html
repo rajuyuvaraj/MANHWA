@@ -57,7 +57,10 @@
 </div>
 
 <!-- Auto-generated data script -->
-<script src="chapters-data.js"></script>
+<script>
+  // Dynamically load to prevent cache issues
+  document.write('<script src="chapters-data.js?v=' + Date.now() + '"><\/script>');
+</script>
 <script>
   // Get chapter from URL (e.g., reader.html?ch=1)
   const urlParams = new URLSearchParams(window.location.search);
