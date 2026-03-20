@@ -33,5 +33,40 @@ const MANHWA_DATA = {
     "ext": ".jpg",
     "releaseTime": 1774096200000,
     "date": "MAR 21, 2026"
+  },
+  "5": {
+    "title": "Chapter 5",
+    "pages": 4,
+    "ext": ".jpg",
+    "releaseTime": 1774182600000,
+    "date": "MAR 22, 2026"
+  },
+  "6": {
+    "title": "Chapter 6",
+    "pages": 4,
+    "ext": ".jpg",
+    "releaseTime": 1774269000000,
+    "date": "MAR 23, 2026"
+  },
+  "7": {
+    "title": "Chapter 7",
+    "pages": 4,
+    "ext": ".jpg",
+    "releaseTime": 1774355400000,
+    "date": "MAR 24, 2026"
+  },
+  "8": {
+    "title": "Chapter 8",
+    "pages": 4,
+    "ext": ".jpg",
+    "releaseTime": 1774441800000,
+    "date": "MAR 25, 2026"
+  },
+  "9": {
+    "title": "Chapter 9",
+    "pages": 4,
+    "ext": ".jpg",
+    "releaseTime": 1774528200000,
+    "date": "MAR 26, 2026"
   }
 };
