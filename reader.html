@@ -79,8 +79,9 @@
     // SECURITY: Block user if they try to change the URL to read early
     container.innerHTML = `<div class="error-msg">Chapter ${currentCh} is locked.<br><br>This chapter drops on ${chapterData.date} at 18:00 (6:00 PM)! ⏳</div>`;
     titleEl.textContent = "Locked Content";
+  } else {
     titleEl.textContent = chapterData.title;
-    
+
     // Auto-generate image tags
     for (let i = 1; i <= chapterData.pages; i++) {
       const img = document.createElement('img');
