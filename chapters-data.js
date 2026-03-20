@@ -26,5 +26,12 @@ const MANHWA_DATA = {
     "ext": ".jpg",
     "releaseTime": 1774009800000,
     "date": "MAR 20, 2026"
+  },
+  "4": {
+    "title": "Chapter 4",
+    "pages": 4,
+    "ext": ".jpg",
+    "releaseTime": 1774096200000,
+    "date": "MAR 21, 2026"
   }
 };
