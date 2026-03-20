@@ -30,7 +30,7 @@ folders.forEach(folder => {
     
     if (fs.statSync(folderPath).isDirectory()) {
       const files = fs.readdirSync(folderPath);
-      const imageFiles = files.filter(f => /\.(png|jpg|jpeg|webp)$/i.test(f));
+      const imageFiles = files.filter(f => /\.(png|jpg|jpeg|webp|jxl)$/i.test(f));
       
       if (imageFiles.length > 0) {
         const ext = path.extname(imageFiles[0]);
