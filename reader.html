@@ -75,26 +75,48 @@
   const chapterData = MANHWA_DATA[currentCh];
   const now = Date.now();
 
+  function renderChapter() {
+    container.innerHTML = '';
+    titleEl.textContent = chapterData.title;
+    for (let i = 1; i <= chapterData.pages; i++) {
+      const img = document.createElement('img');
+      const extension = chapterData.ext || ".jpg";
+      img.src = `chapters/ch${currentCh}/${i}${extension}`;
+      img.alt = `Page ${i}`;
+      img.loading = "lazy";
+      container.appendChild(img);
+    }
+  }
+
   if (!chapterData) {
     container.innerHTML = `<div class="error-msg">Chapter ${currentCh} is not uploaded yet.<br><br>Waiting for Ammu's creator to draw more! 💖</div>`;
     titleEl.textContent = "Not Found";
-  } else if (now < chapterData.releaseTime) {
-    // SECURITY: Block user if they try to change the URL to read early
-    container.innerHTML = `<div class="error-msg">Chapter ${currentCh} is locked.<br><br>This chapter drops on ${chapterData.date} at 18:00 (6:00 PM)! ⏳</div>`;
+  } else if (now < chapterData.releaseTime && sessionStorage.getItem('unlocked_' + currentCh) !== 'true') {
+    // SECURITY: Chapter is locked, prompt for early access password
     titleEl.textContent = "Locked Content";
-  } else {
-    titleEl.textContent = chapterData.title;
+    container.innerHTML = `
+      <div class="error-msg" style="padding: 60px 20px;">
+        Chapter ${currentCh} drops on ${chapterData.date} at 18:00 (6:00 PM)! ⏳<br><br>
+        <div style="margin-top: 30px; padding: 30px; background: rgba(19,16,26,0.5); border: 1px solid var(--crimson); border-radius: 8px; max-width: 400px; margin-left: auto; margin-right: auto;">
+          <div style="font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; letter-spacing: 0.1em; color: var(--paper); margin-bottom: 20px;">AMMU'S EARLY ACCESS</div>
+          <input type="password" id="secretPwd" placeholder="Enter Password" style="background: transparent; border: 1px solid var(--mist); color: var(--paper); padding: 12px 20px; font-family: 'Space Mono', monospace; text-align: center; margin-bottom: 20px; outline: none; width: 100%; letter-spacing: 0.2em;">
+          <br>
+          <button id="unlockBtn" class="ch-btn" style="width: 100%;">Unlock Chapter</button>
+          <div id="pwdError" style="color: var(--crimson); margin-top: 15px; display: none; font-size: 0.8rem; letter-spacing: 0.1em;">Incorrect password 💔</div>
+        </div>
+      </div>
+    `;
 
-    // Auto-generate image tags
-    for (let i = 1; i <= chapterData.pages; i++) {
-      const img = document.createElement('img');
-      const extension = chapterData.ext || ".jpg"; // Defaults to jpg if not specified
-      
-      img.src = `chapters/ch${currentCh}/${i}${extension}`;
-      img.alt = `Page ${i}`;
-      img.loading = "lazy"; // Important for fast loading
-      container.appendChild(img);
-    }
+    document.getElementById('unlockBtn').addEventListener('click', () => {
+      if (document.getElementById('secretPwd').value === "2216") {
+        sessionStorage.setItem('unlocked_' + currentCh, 'true');
+        renderChapter();
+      } else {
+        document.getElementById('pwdError').style.display = 'block';
+      }
+    });
+  } else {
+    renderChapter();
   }
 
   // Setup Next/Prev Buttons
